@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#2f7d4f">
+  <meta name="description" content="Nối Thú — game nối hai con thú giống nhau bằng đường gấp khúc tối đa hai lần rẽ.">
+  <title>Nối Thú</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="hud">
+    <div class="brand"><span aria-hidden="true">🐾</span> Nối Thú</div>
+
+    <dl class="stats">
+      <div><dt>Màn</dt><dd id="level">1</dd></div>
+      <div><dt>Điểm</dt><dd id="score">0</dd></div>
+      <div><dt>Kỷ lục</dt><dd id="best">0</dd></div>
+    </dl>
+
+    <div class="timer" role="timer" aria-label="Thời gian còn lại">
+      <div class="timer-track"><div class="timer-fill" id="timer-fill"></div></div>
+      <span class="timer-text" id="timer-text">0:00</span>
+    </div>
+
+    <div class="gravity" id="gravity" title="Kiểu rơi của màn này"></div>
+
+    <div class="actions">
+      <button class="action" id="hint-btn" title="Gợi ý (H)">💡<span class="badge" id="hint-count">3</span></button>
+      <button class="action" id="shuffle-btn" title="Đảo bàn (S)">🔀<span class="badge" id="shuffle-count">3</span></button>
+      <button class="action" id="pause-btn" title="Tạm dừng (P)" aria-label="Tạm dừng">⏸</button>
+      <button class="action" id="sound-btn" title="Âm thanh (M)" aria-label="Âm thanh">🔊</button>
+    </div>
+  </header>
+
+  <main class="stage" id="stage">
+    <div class="board" id="board" role="group" aria-label="Bàn chơi">
+      <svg class="path-layer" id="path-layer" aria-hidden="true"></svg>
+    </div>
+    <div class="combo" id="combo" aria-live="polite"></div>
+  </main>
+
+  <section class="overlay" id="overlay" role="dialog" aria-modal="true" aria-labelledby="overlay-title">
+    <div class="panel" id="panel"></div>
+  </section>
+
+  <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+  <script type="module" src="src/main.js"></script>
+</body>
+</html>
