@@ -7,6 +7,9 @@ import {
   COMBO_WINDOW,
   Game,
   HINTS_PER_LEVEL,
+  hintsForLevel,
+  MAX_HINTS,
+  MORE_HINTS_FROM_LEVEL,
   levelConfig,
   POINTS_PER_PAIR,
   SHUFFLES_PER_LEVEL,
@@ -49,6 +52,26 @@ describe("levelConfig", () => {
     assert.equal(levelConfig(1 + GRAVITY_MODES.length).gravity, "none");
     assert.equal(levelConfig(50).timeLimit, 180);
     assert.equal(levelConfig(50).kindCount, 36);
+  });
+
+  it("gives more hints from level 4 (← Dồn trái) on, growing slowly up to a cap", () => {
+    assert.equal(levelConfig(MORE_HINTS_FROM_LEVEL).gravity, "left");
+    assert.deepEqual([1, 2, 3].map(hintsForLevel), [3, 3, 3]);
+    assert.deepEqual([4, 5, 6, 7, 10, 13].map(hintsForLevel), [5, 5, 5, 6, 7, 8]);
+    assert.equal(hintsForLevel(50), MAX_HINTS);
+    for (let level = 1; level < 30; level += 1) {
+      assert.ok(hintsForLevel(level + 1) >= hintsForLevel(level), `never fewer hints at level ${level + 1}`);
+    }
+  });
+
+  it("a level starts with its own number of hints", () => {
+    const game = new Game({ seed: 5 });
+    game.newGame();
+    assert.equal(game.hintsLeft, HINTS_PER_LEVEL);
+    game.startLevel(4);
+    assert.equal(game.hintsLeft, 5);
+    for (let i = 0; i < 5; i += 1) assert.ok(game.hint());
+    assert.equal(game.hint(), null);
   });
 
   it("swaps dimensions in portrait", () => {

@@ -7,7 +7,10 @@ most **two turns** before the clock runs out. Every level adds a new **gravity**
 - 9 × 16 board (16 × 9 on phones), 36 animals, paths may wrap around the outer edge
 - 9 gravity modes: still, fall, rise, slide left/right, collapse to / split from the centre
 - Combos, time bonus, best score, hints, shuffles, automatic deadlock shuffle
-- Mouse, touch and full keyboard play · light & dark theme · sound effects synthesised in code
+- More hints on harder levels: 3 on levels 1–3, 5 from level 4 (← slide left), +1 every 3 levels (max 8)
+- A **hidden picture** behind every level shows through as tiles go and is fully revealed on clear (6 original scenes)
+- Background **music** while playing (4 original loops) plus sound effects, all synthesised in code
+- Mouse, touch and full keyboard play · light & dark theme
 - Zero dependencies, no build step — pure ES modules
 
 ## Play
@@ -24,11 +27,12 @@ npm start      # http://127.0.0.1:5173
 | `S`            | Shuffle          |
 | `P` / `Esc`    | Pause            |
 | `M`            | Sound on/off     |
+| `N`            | Music on/off     |
 
 ## Test
 
 ```bash
-npm test       # 61 tests, includes an automatic solver clearing full levels in every gravity mode
+npm test       # 66 tests, includes an automatic solver clearing full levels in every gravity mode
 ```
 
 ## Project layout
@@ -36,7 +40,8 @@ npm test       # 61 tests, includes an automatic solver clearing full levels in 
 ```text
 index.html, styles.css      UI shell
 src/main.js                 UI controller: rendering, animation, input, overlays
-src/ui/audio.js, storage.js WebAudio effects, safe localStorage
+src/ui/audio.js, storage.js WebAudio effects + music, safe localStorage
+src/ui/scenes.js            background pictures drawn as SVG (one per level)
 src/core/                   pure game rules (no DOM) — fully unit-tested
   board.js                  padded grid with stable tile ids
   path.js                   ≤ 2-turn path finder
@@ -60,3 +65,9 @@ scripts/serve.mjs           zero-dependency static dev server
 
 Game design and code are original. Tile faces are standard Unicode emoji rendered by your
 system font. Licensed under Apache-2.0.
+
+## Analytics
+
+Optional, anonymous play counts via [GoatCounter](https://www.goatcounter.com): no cookies and no
+personal data. It is off until you set `GOATCOUNTER_CODE` in `src/ui/analytics.js`. Events are
+sent when a game starts and when it ends; see the `track(...)` calls in `src/main.js`.

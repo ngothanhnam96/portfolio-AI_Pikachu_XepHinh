@@ -30,12 +30,17 @@
       <button class="action" id="hint-btn" title="Gợi ý (H)">💡<span class="badge" id="hint-count">3</span></button>
       <button class="action" id="shuffle-btn" title="Đảo bàn (S)">🔀<span class="badge" id="shuffle-count">3</span></button>
       <button class="action" id="pause-btn" title="Tạm dừng (P)" aria-label="Tạm dừng">⏸</button>
+      <button class="action" id="music-btn" title="Nhạc nền (N)" aria-label="Nhạc nền">🎵</button>
       <button class="action" id="sound-btn" title="Âm thanh (M)" aria-label="Âm thanh">🔊</button>
     </div>
   </header>
 
   <main class="stage" id="stage">
     <div class="board" id="board" role="group" aria-label="Bàn chơi">
+      <div class="scene" id="scene" aria-hidden="true">
+        <div class="scene-art" id="scene-art"></div>
+        <div class="scene-caption" id="scene-caption"></div>
+      </div>
       <svg class="path-layer" id="path-layer" aria-hidden="true"></svg>
     </div>
     <div class="combo" id="combo" aria-live="polite"></div>

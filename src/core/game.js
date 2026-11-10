@@ -17,6 +17,14 @@ export const COMBO_WINDOW = 4; // seconds between matches to keep a combo going
 export const TIME_BONUS_PER_SECOND = 2;
 export const HINTS_PER_LEVEL = 3;
 export const SHUFFLES_PER_LEVEL = 3;
+export const MORE_HINTS_FROM_LEVEL = 4; // from "← Dồn trái" on, sliding boards get much harder to read
+export const MAX_HINTS = 8;
+
+/** Hints for a level: 3 early on, 5 from level 4, then +1 every 3 levels (max 8). */
+export function hintsForLevel(level) {
+  if (level < MORE_HINTS_FROM_LEVEL) return HINTS_PER_LEVEL;
+  return Math.min(MAX_HINTS, 5 + Math.floor((level - MORE_HINTS_FROM_LEVEL) / 3));
+}
 
 export function levelConfig(level, orientation = "landscape") {
   const portrait = orientation === "portrait";
@@ -27,6 +35,7 @@ export function levelConfig(level, orientation = "landscape") {
     kindCount: Math.min(ANIMALS.length, 24 + 3 * (level - 1)),
     timeLimit: Math.max(180, 420 - 25 * (level - 1)),
     gravity: GRAVITY_MODES[(level - 1) % GRAVITY_MODES.length],
+    hints: hintsForLevel(level),
   };
 }
 
@@ -57,7 +66,7 @@ export class Game {
     this.board = createBoard({ ...this.config, rng: this.rng });
     ensureMove(this.board, this.rng);
     this.timeLeft = this.config.timeLimit;
-    this.hintsLeft = HINTS_PER_LEVEL;
+    this.hintsLeft = this.config.hints ?? HINTS_PER_LEVEL;
     this.shufflesLeft = SHUFFLES_PER_LEVEL;
     this.selected = null;
     this.combo = 0;

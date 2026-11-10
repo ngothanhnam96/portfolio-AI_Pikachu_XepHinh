@@ -363,3 +363,54 @@ button:focus-visible {
   .tile.hint .tile-body { animation: none; box-shadow: 0 0 0 4px var(--hint); }
   .combo.show { animation-duration: 0.01s; }
 }
+
+/* Background picture ---------------------------------------------------------------------- */
+
+.scene {
+  position: absolute;
+  overflow: hidden;
+  border-radius: 10px;
+  pointer-events: none;
+  opacity: 0.55;
+  transition: opacity 0.6s ease, box-shadow 0.6s ease;
+}
+.scene-art, .scene-art svg { display: block; width: 100%; height: 100%; }
+.scene-caption {
+  position: absolute;
+  left: 50%;
+  bottom: 10px;
+  transform: translate(-50%, 8px);
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: rgb(0 0 0 / 0.5);
+  color: #fff;
+  font-weight: 700;
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 0.5s 0.3s, transform 0.5s 0.3s;
+}
+.board.revealed .scene { opacity: 1; box-shadow: 0 10px 40px rgb(0 0 0 / 0.25); }
+.board.revealed .scene-art { animation: reveal 1.6s ease-out; }
+.board.revealed .scene-caption { opacity: 1; transform: translate(-50%, 0); }
+@keyframes reveal {
+  from { transform: scale(1.06); filter: brightness(1.3); }
+  to { transform: none; filter: none; }
+}
+
+.scene-thumb {
+  width: min(240px, 70%);
+  aspect-ratio: 16 / 9;
+  margin: 0 auto 12px;
+  overflow: hidden;
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgb(0 0 0 / 0.2);
+}
+.scene-thumb svg { display: block; width: 100%; height: 100%; }
+.scene-name { margin-top: -4px; }
+
+.action.off { opacity: 0.45; }
+
+@media (prefers-reduced-motion: reduce) {
+  .board.revealed .scene-art { animation: none; }
+  .scene, .scene-caption { transition: none; }
+}

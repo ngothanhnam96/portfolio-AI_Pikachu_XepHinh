@@ -1,6 +1,6 @@
 # 03 · Tasks
 
-✅ done in v0.1.0 · ⏭ backlog
+✅ done (v0.1.0 unless noted) · ⏭ backlog
 
 | ID   | Task                                                           | Covers           | Status |
 |------|----------------------------------------------------------------|------------------|--------|
@@ -15,6 +15,8 @@
 | T-09 | Keyboard controls                                              | FR-12            | ✅ |
 | T-10 | WebAudio sounds + mute, best score persistence                 | FR-9, FR-11      | ✅ |
 | T-11 | Static dev server, CI workflow, GitHub Pages deploy            | NFR-1, NFR-7     | ✅ |
+| T-15 | Background pictures per level, reveal on clear (v0.2.0)        | FR-13            | ✅ |
+| T-16 | Background music while playing + music toggle (v0.2.0)         | FR-11, FR-12     | ✅ |
 | T-12 | Online leaderboard                                             | —                | ⏭ |
 | T-13 | Custom tile packs (fruits, vehicles, user images)              | —                | ⏭ |
 | T-14 | Daily seeded challenge (same board for everyone)               | —                | ⏭ |

@@ -58,7 +58,7 @@ Then the cycle repeats with harder parameters.
 |---------------|-------------------------------------------|-----|-----|-----|
 | Animal kinds  | `min(36, 24 + 3·(L−1))`                   | 24  | 36  | 36  |
 | Time (s)      | `max(180, 420 − 25·(L−1))`                | 420 | 320 | 195 |
-| Hints / level | 3                                         |     |     |     |
+| Hints / level | `3` for L1–3, then `min(8, 5 + ⌊(L−4)/3⌋)` | 3   | 5   | 7   |
 | Shuffles / level | 3                                      |     |     |     |
 
 Kinds are assigned pair by pair (`pair i → kind i mod K`), so every kind appears an even
@@ -83,7 +83,16 @@ level can always be finished.
 - Path drawn in an SVG overlay through cell centres (including the outer ring), fades in 0.35 s.
 - Removal: scale + fade; gravity: transform transition 160 ms.
 - Sounds synthesised with WebAudio (no asset files); pitch rises with combo.
-- Best score and mute flag in `localStorage` (wrapped in try/catch).
+- **Background picture:** each level gets one of 6 original landscapes (`src/ui/scenes.js`),
+  drawn as an SVG string with seeded scatter, so a level always shows the same picture. It sits
+  under the tile area (inside the empty ring) at 55 % opacity while playing and shows through as
+  pairs are removed. On clear it goes to full opacity with a short zoom and a caption, and the
+  clear dialog waits 2.4 s, then shows a thumbnail of it.
+- **Background music:** 4 original 16-step loops (triangle lead + sine bass) on their own gain
+  bus, one per level (cycling). A look-ahead scheduler queues notes on the audio clock. Music
+  plays only in the `playing` state, so pause, level clear, game over and a hidden tab silence it.
+  Sound off (`M`) mutes everything, and music off (`N`) mutes only the loop.
+- Best score, mute and music flags in `localStorage` (wrapped in try/catch).
 
 ## Risks
 

@@ -2,8 +2,12 @@
 
 import { Game } from "./core/game.js";
 import { ANIMALS } from "./core/tiles.js";
-import { isMuted, setMuted, sfx } from "./ui/audio.js";
+import { isMuted, isMusicOn, playMusic, setMusic, setMuted, sfx, stopMusic } from "./ui/audio.js";
+import { sceneFor } from "./ui/scenes.js";
 import { load, save } from "./ui/storage.js";
+import { initAnalytics, track } from "./ui/analytics.js";
+
+initAnalytics();
 
 const GRAVITY_LABELS = {
   none: "Đứng yên",
@@ -19,6 +23,7 @@ const GRAVITY_LABELS = {
 const LOW_TIME = 30;
 const REMOVE_MS = 300;
 const SETTLE_MS = 200;
+const REVEAL_MS = 2400; // time to admire the uncovered picture before the clear dialog
 
 const $ = (id) => document.getElementById(id);
 const ui = {
@@ -41,6 +46,10 @@ const ui = {
   shuffleCount: $("shuffle-count"),
   pauseButton: $("pause-btn"),
   soundButton: $("sound-btn"),
+  musicButton: $("music-btn"),
+  scene: $("scene"),
+  sceneArt: $("scene-art"),
+  sceneCaption: $("scene-caption"),
   combo: $("combo"),
   toast: $("toast"),
 };
@@ -61,6 +70,8 @@ let toastTimer = 0;
 let shownSecond = -1;
 
 setMuted(load("muted", false));
+setMusic(load("music", true));
+let sceneLevel = 0;
 
 // Layout & rendering -----------------------------------------------------------------------
 
@@ -95,6 +106,12 @@ function layout() {
   ui.pathLayer.setAttribute("viewBox", `0 0 ${pixelWidth} ${pixelHeight}`);
   ui.pathLayer.setAttribute("width", pixelWidth);
   ui.pathLayer.setAttribute("height", pixelHeight);
+  Object.assign(ui.scene.style, {
+    left: `${size}px`,
+    top: `${size}px`,
+    width: `${(board.width - 2) * size}px`,
+    height: `${(board.height - 2) * size}px`,
+  });
   render();
 }
 
@@ -155,6 +172,21 @@ function renderCursor() {
   cursorGhost.style.transform = `translate(${cursor.c * size}px, ${cursor.r * size}px)`;
 }
 
+/** Puts this level's picture behind the tiles; it shows through as pairs are removed. */
+function showScene() {
+  ui.board.classList.remove("revealed");
+  if (sceneLevel === game.level) return;
+  sceneLevel = game.level;
+  const scene = sceneFor(game.level);
+  ui.sceneArt.innerHTML = scene.svg;
+  ui.sceneCaption.textContent = `🖼️ ${scene.name}`;
+}
+
+function syncMusic() {
+  if (game.state === "playing" && isMusicOn() && !isMuted()) playMusic(game.level - 1);
+  else stopMusic();
+}
+
 function clearBoard() {
   for (const node of tileNodes.values()) node.remove();
   tileNodes.clear();
@@ -200,8 +232,11 @@ function updateHud() {
   ui.shuffleButton.disabled = game.shufflesLeft === 0;
   ui.gravity.textContent = GRAVITY_LABELS[game.config.gravity];
   ui.soundButton.textContent = isMuted() ? "🔇" : "🔊";
+  ui.musicButton.classList.toggle("off", !isMusicOn());
+  ui.musicButton.setAttribute("aria-pressed", String(isMusicOn()));
   ui.pauseButton.textContent = game.state === "paused" ? "▶" : "⏸";
   ui.board.classList.toggle("paused", game.state === "paused");
+  syncMusic();
 }
 
 function toast(message) {
@@ -280,8 +315,9 @@ function onMatch(event) {
     rememberBest();
     setTimeout(() => {
       sfx.clear();
-      showLevelClear(event.levelClear);
-    }, 450);
+      ui.board.classList.add("revealed");
+    }, REMOVE_MS + 50);
+    setTimeout(() => showLevelClear(event.levelClear), REMOVE_MS + REVEAL_MS);
   }
 }
 
@@ -332,6 +368,14 @@ function toggleSound() {
   updateHud();
 }
 
+function toggleMusic() {
+  sfx.unlock();
+  setMusic(!isMusicOn());
+  save("music", isMusicOn());
+  toast(isMusicOn() ? "🎵 Bật nhạc nền" : "Tắt nhạc nền");
+  updateHud();
+}
+
 function rememberBest() {
   if (game.score > best) {
     best = game.score;
@@ -344,7 +388,9 @@ function startGame() {
   clearBoard();
   game.orientation = preferredOrientation();
   game.newGame();
+  track("pikachu/start");
   cursor = null;
+  showScene();
   layout();
   updateHud();
 }
@@ -353,13 +399,17 @@ function nextLevel() {
   closePanel();
   clearBoard();
   game.orientation = preferredOrientation();
+  const hintsBefore = game.config.hints;
   game.nextLevel();
   cursor = null;
+  showScene();
   layout();
   updateHud();
+  if (game.config.hints > hintsBefore) toast(`💡 Màn khó hơn — bạn có ${game.config.hints} lượt gợi ý`);
 }
 
 function onGameOver(event) {
+  track("pikachu/time-up");
   const record = event.score > best;
   rememberBest();
   sfx.over();
@@ -395,7 +445,8 @@ function showStart() {
       <li>Đường nối chỉ đi <strong>ngang/dọc</strong>, qua ô trống, <strong>tối đa 2 lần rẽ</strong> — được đi vòng ra ngoài viền.</li>
       <li>Mỗi màn có một <strong>kiểu rơi</strong> khác: thú trượt theo hướng sau mỗi lần nối.</li>
       <li>Nối nhanh liên tiếp để được <strong>combo</strong>; thời gian còn lại thành điểm thưởng.</li>
-      <li>Phím: <kbd>←↑↓→</kbd> di chuyển, <kbd>Enter</kbd> chọn, <kbd>H</kbd> gợi ý, <kbd>S</kbd> đảo, <kbd>P</kbd> dừng, <kbd>M</kbd> âm thanh.</li>
+      <li>Phím: <kbd>←↑↓→</kbd> di chuyển, <kbd>Enter</kbd> chọn, <kbd>H</kbd> gợi ý, <kbd>S</kbd> đảo, <kbd>P</kbd> dừng, <kbd>M</kbd> âm thanh, <kbd>N</kbd> nhạc nền.</li>
+      <li>Mỗi màn giấu một <strong>bức tranh</strong> phía sau — xóa hết thú để ngắm trọn vẹn.</li>
     </ul>
     ${best ? `<p>Kỷ lục của bạn: <strong>${best.toLocaleString("vi-VN")}</strong></p>` : ""}
     <div class="buttons"><button class="button" data-action="play">Chơi ngay</button></div>`);
@@ -412,10 +463,12 @@ function showPause() {
 }
 
 function showLevelClear({ bonus, level }) {
+  track("pikachu/level-clear");
   const upcoming = game.configFor(level + 1, preferredOrientation()).gravity;
   openPanel(`
-    <div class="hero" aria-hidden="true">🎉</div>
-    <h2 id="overlay-title">Hoàn thành màn ${level}!</h2>
+    <div class="scene-thumb" aria-hidden="true">${sceneFor(level).svg}</div>
+    <h2 id="overlay-title">🎉 Hoàn thành màn ${level}!</h2>
+    <p class="scene-name">Bức tranh: <strong>${sceneFor(level).name}</strong></p>
     <p>Thưởng thời gian: <strong>+${bonus.toLocaleString("vi-VN")}</strong></p>
     <div class="big">${game.score.toLocaleString("vi-VN")}</div>
     <p>Màn tiếp theo: <strong>${GRAVITY_LABELS[upcoming]}</strong></p>
@@ -444,6 +497,7 @@ ui.hintButton.addEventListener("click", useHint);
 ui.shuffleButton.addEventListener("click", useShuffle);
 ui.pauseButton.addEventListener("click", togglePause);
 ui.soundButton.addEventListener("click", toggleSound);
+ui.musicButton.addEventListener("click", toggleMusic);
 
 const ARROWS = { ArrowUp: [-1, 0], ArrowDown: [1, 0], ArrowLeft: [0, -1], ArrowRight: [0, 1] };
 
@@ -455,6 +509,7 @@ document.addEventListener("keydown", (event) => {
   }
   if (key === "p" || key === "P" || key === "Escape") return togglePause();
   if (key === "m" || key === "M") return toggleSound();
+  if (key === "n" || key === "N") return toggleMusic();
   if (game.state !== "playing") return;
   if (key === "h" || key === "H") return useHint();
   if (key === "s" || key === "S") return useShuffle();
@@ -505,6 +560,7 @@ function frame(now) {
 game.orientation = preferredOrientation();
 game.newGame();
 game.pause();
+showScene();
 layout();
 updateHud();
 showStart();
