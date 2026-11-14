@@ -414,3 +414,236 @@ button:focus-visible {
   .board.revealed .scene-art { animation: none; }
   .scene, .scene-caption { transition: none; }
 }
+
+/* =====================================================================================
+   Modern casual finish: a living sky, a framed tray, glossy 3D candy tiles, a juicy HUD
+   and a bouncy title card. Overrides only — the layout and game rules are untouched.
+   ===================================================================================== */
+
+:root {
+  --sky-1: #7fd0ff;
+  --sky-2: #bdf0d2;
+  --sky-3: #fff3c4;
+  --hill-1: #7ccf6a;
+  --hill-2: #4fae5a;
+  --tile-top: #fffdf7;
+  --tile-bottom: #f5e6c6;
+  --tile-thick: #c9a466;
+  --tile-gloss: rgba(255, 255, 255, 0.95);
+  --tray: rgba(255, 255, 255, 0.42);
+  --candy-1: #5fd47e;
+  --candy-2: #23964a;
+  --candy-edge: #16703a;
+  --pill: linear-gradient(180deg, rgb(255 255 255 / 0.9), rgb(255 255 255 / 0.55));
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --sky-1: #0b1640; --sky-2: #1c2f63; --sky-3: #2b3f72;
+    --hill-1: #1d4a35; --hill-2: #143626;
+    --tile-top: #3a4d43; --tile-bottom: #26352d; --tile-thick: #0f1a14; --tile-gloss: rgba(255, 255, 255, 0.28);
+    --tray: rgba(10, 20, 40, 0.45);
+    --pill: linear-gradient(180deg, rgb(255 255 255 / 0.12), rgb(255 255 255 / 0.05));
+  }
+}
+:root[data-theme="dark"] {
+  --sky-1: #0b1640; --sky-2: #1c2f63; --sky-3: #2b3f72;
+  --hill-1: #1d4a35; --hill-2: #143626;
+  --tile-top: #3a4d43; --tile-bottom: #26352d; --tile-thick: #0f1a14; --tile-gloss: rgba(255, 255, 255, 0.28);
+  --tray: rgba(10, 20, 40, 0.45);
+  --pill: linear-gradient(180deg, rgb(255 255 255 / 0.12), rgb(255 255 255 / 0.05));
+}
+
+/* --- a living sky: gradient, drifting cloud puffs and rolling hills ------------------------- */
+body { background: linear-gradient(180deg, var(--sky-1) 0%, var(--sky-2) 58%, var(--sky-3) 100%); }
+body::before {
+  content: ""; position: fixed; inset: -10% -20%; z-index: -1; pointer-events: none;
+  background:
+    radial-gradient(closest-side, rgb(255 255 255 / 0.85), transparent) 8% 18% / 220px 90px no-repeat,
+    radial-gradient(closest-side, rgb(255 255 255 / 0.75), transparent) 30% 10% / 300px 110px no-repeat,
+    radial-gradient(closest-side, rgb(255 255 255 / 0.7), transparent) 72% 16% / 260px 100px no-repeat,
+    radial-gradient(closest-side, rgb(255 255 255 / 0.6), transparent) 92% 30% / 200px 80px no-repeat,
+    radial-gradient(closest-side, rgb(255 255 255 / 0.5), transparent) 52% 26% / 180px 70px no-repeat;
+  animation: clouds 60s linear infinite alternate;
+  opacity: 0.9;
+}
+@keyframes clouds { to { transform: translateX(8%); } }
+body::after {
+  content: ""; position: fixed; left: -10%; right: -10%; bottom: -6%; height: 34%; z-index: -1; pointer-events: none;
+  background:
+    radial-gradient(60% 90% at 20% 100%, var(--hill-1) 60%, transparent 61%),
+    radial-gradient(55% 80% at 75% 100%, var(--hill-1) 60%, transparent 61%),
+    radial-gradient(70% 70% at 50% 120%, var(--hill-2) 60%, transparent 61%);
+  opacity: 0.85;
+}
+
+/* --- HUD: a glossy bar with candy pills ------------------------------------------------------ */
+.hud {
+  background: linear-gradient(180deg, color-mix(in srgb, var(--surface) 92%, transparent), color-mix(in srgb, var(--surface) 70%, transparent));
+  border-bottom: 0;
+  box-shadow: 0 6px 24px rgb(0 40 20 / 0.12), inset 0 -1px 0 rgb(255 255 255 / 0.5);
+  backdrop-filter: blur(14px) saturate(1.4);
+}
+.brand { font-size: 1.35rem; font-weight: 900; color: #ff7a3c; text-shadow: 0 2px 0 rgb(255 255 255 / 0.9); }
+.brand span { display: inline-block; animation: paw 2.6s ease-in-out infinite; }
+@keyframes paw { 0%, 70%, 100% { transform: rotate(0); } 80% { transform: rotate(-18deg) scale(1.15); } 90% { transform: rotate(12deg); } }
+.stats div {
+  padding: 4px 12px; border-radius: 14px;
+  background: var(--pill);
+  box-shadow: inset 0 -2px 0 rgb(0 0 0 / 0.06), 0 2px 6px rgb(0 0 0 / 0.08);
+}
+.stats dd { font-size: 1.05rem; font-weight: 900; }
+.timer-track { height: 14px; background: rgb(0 0 0 / 0.12); box-shadow: inset 0 2px 3px rgb(0 0 0 / 0.18); }
+.timer-fill {
+  background:
+    repeating-linear-gradient(-45deg, rgb(255 255 255 / 0.28) 0 8px, transparent 8px 16px),
+    linear-gradient(180deg, #8ff0a4, #2fae5b);
+  background-size: 22px 22px, auto;
+  animation: candy-stripes 0.8s linear infinite;
+  box-shadow: inset 0 2px 0 rgb(255 255 255 / 0.55), 0 0 12px rgb(47 174 91 / 0.55);
+}
+.timer.low .timer-fill {
+  background:
+    repeating-linear-gradient(-45deg, rgb(255 255 255 / 0.28) 0 8px, transparent 8px 16px),
+    linear-gradient(180deg, #ff9a9a, #e23b3b);
+  background-size: 22px 22px, auto;
+  box-shadow: inset 0 2px 0 rgb(255 255 255 / 0.55), 0 0 14px rgb(226 59 59 / 0.7);
+  animation: candy-stripes 0.4s linear infinite, throb 0.6s ease-in-out infinite;
+}
+@keyframes candy-stripes { to { background-position: 22px 0, 0 0; } }
+@keyframes throb { 50% { filter: brightness(1.25); } }
+.timer-text { font-size: 1.05rem; font-weight: 900; }
+.gravity { background: linear-gradient(180deg, #ffd166, #ff9f1c); color: #4a2600; box-shadow: inset 0 -2px 0 rgb(0 0 0 / 0.15); }
+.action {
+  border-radius: 50% !important;
+  border: 0 !important;
+  background: linear-gradient(180deg, #ffffff, #e9f3ec) !important;
+  box-shadow: inset 0 -3px 0 rgb(0 0 0 / 0.1), 0 3px 8px rgb(0 0 0 / 0.12);
+  transition: transform 0.12s ease;
+}
+.action:hover:not(:disabled) { transform: translateY(-2px) scale(1.06); }
+.action:active:not(:disabled) { transform: translateY(1px) scale(0.96); }
+.action .badge { background: linear-gradient(180deg, #ff7a59, #e2452b) !important; box-shadow: 0 2px 4px rgb(0 0 0 / 0.2); }
+
+/* --- the board sits in a frosted tray -------------------------------------------------------- */
+.board::before {
+  content: ""; position: absolute; inset: calc(var(--tile-size, 40px) - 14px); z-index: -1; border-radius: 28px;
+  background: linear-gradient(180deg, var(--tray), color-mix(in srgb, var(--tray) 60%, transparent));
+  box-shadow: inset 0 2px 0 rgb(255 255 255 / 0.7), inset 0 0 0 1px rgb(255 255 255 / 0.35), 0 24px 60px rgb(20 70 40 / 0.28);
+  backdrop-filter: blur(10px);
+}
+
+/* --- glossy 3D candy tiles -------------------------------------------------------------------- */
+.tile { padding: 2.5px; }
+.tile-body {
+  position: relative;
+  border: 0;
+  border-radius: 24%;
+  background:
+    radial-gradient(120% 60% at 50% -6%, var(--tile-gloss), transparent 62%),
+    linear-gradient(180deg, var(--tile-top), var(--tile-bottom));
+  box-shadow:
+    inset 0 -3px 0 rgb(0 0 0 / 0.07),
+    inset 0 2px 0 rgb(255 255 255 / 0.85),
+    0 4px 0 var(--tile-thick),
+    0 7px 10px rgb(60 40 10 / 0.22);
+  transition: transform 0.16s cubic-bezier(.2, 1.6, .4, 1), box-shadow 0.16s ease, background 0.16s ease;
+}
+.tile-body .face { filter: drop-shadow(0 2px 1px rgb(0 0 0 / 0.18)); transform: translateY(-1px); }
+@media (hover: hover) {
+  .tile:hover .tile-body {
+    transform: translateY(-3px) scale(1.05);
+    background: radial-gradient(120% 60% at 50% -6%, var(--tile-gloss), transparent 62%), linear-gradient(180deg, #ffffff, color-mix(in srgb, var(--tile-bottom) 70%, #fff3c4));
+    box-shadow: inset 0 -3px 0 rgb(0 0 0 / 0.07), inset 0 2px 0 #fff, 0 6px 0 var(--tile-thick), 0 12px 16px rgb(60 40 10 / 0.26);
+  }
+}
+.tile.selected .tile-body {
+  transform: translateY(-5px) scale(1.08);
+  background: radial-gradient(120% 60% at 50% -6%, rgb(255 255 255 / 0.95), transparent 62%), linear-gradient(180deg, #fff3a6, #ffc93c);
+  box-shadow: 0 0 0 3px #fff, 0 0 0 6px var(--ring), 0 6px 0 #c78a00, 0 0 24px 4px color-mix(in srgb, var(--ring) 55%, transparent);
+  animation: selected-bob 1s ease-in-out infinite;
+}
+@keyframes selected-bob { 50% { transform: translateY(-7px) scale(1.08); } }
+.tile.hint .tile-body { animation: hint-glow 0.9s ease-in-out infinite; }
+@keyframes hint-glow {
+  50% { transform: scale(1.08) rotate(-3deg); box-shadow: 0 0 0 4px #fff, 0 0 0 7px var(--hint), 0 0 26px 6px color-mix(in srgb, var(--hint) 60%, transparent), 0 4px 0 var(--tile-thick); }
+}
+/* a matched pair pops with a sparkle ring */
+.tile.removing .tile-body { animation: candy-pop 0.32s cubic-bezier(.3, 1.6, .5, 1) forwards; }
+@keyframes candy-pop {
+  35% { transform: scale(1.22) rotate(6deg); filter: brightness(1.25); }
+  to { transform: scale(0.1) rotate(-12deg); opacity: 0; }
+}
+.tile.removing::after {
+  content: ""; position: absolute; inset: -20%; border-radius: 50%; pointer-events: none;
+  background:
+    radial-gradient(circle, rgb(255 255 255 / 0.95) 0 8%, transparent 9%) 50% 0 / 30% 30% no-repeat,
+    radial-gradient(circle, rgb(255 230 120 / 0.95) 0 8%, transparent 9%) 100% 50% / 30% 30% no-repeat,
+    radial-gradient(circle, rgb(255 255 255 / 0.95) 0 8%, transparent 9%) 50% 100% / 30% 30% no-repeat,
+    radial-gradient(circle, rgb(255 180 120 / 0.95) 0 8%, transparent 9%) 0 50% / 30% 30% no-repeat,
+    radial-gradient(circle, transparent 52%, rgb(255 255 255 / 0.9) 54%, transparent 62%);
+  animation: sparkle 0.42s ease-out forwards;
+}
+@keyframes sparkle { from { transform: scale(0.3); opacity: 1; } to { transform: scale(1.5) rotate(45deg); opacity: 0; } }
+.path-layer polyline { filter: drop-shadow(0 0 6px color-mix(in srgb, var(--path) 70%, transparent)); }
+
+/* --- combo: big, outlined, bouncy ------------------------------------------------------------ */
+.combo {
+  top: 4px; z-index: 4;
+  font-size: clamp(1.6rem, 4vw, 2.4rem); font-weight: 900; letter-spacing: 0.02em;
+  background: linear-gradient(180deg, #fff7b0, #ffb300 60%, #ff7a00); -webkit-background-clip: text; background-clip: text; color: transparent;
+  -webkit-text-stroke: 1.5px rgb(120 50 0 / 0.55);
+  filter: drop-shadow(0 3px 0 rgb(255 255 255 / 0.85)) drop-shadow(0 6px 10px rgb(0 0 0 / 0.25));
+}
+@keyframes combo {
+  15% { opacity: 1; transform: translate(-50%, -6px) scale(1.35) rotate(-4deg); }
+  35% { transform: translate(-50%, -6px) scale(1) rotate(2deg); }
+  70% { opacity: 1; }
+  to { opacity: 0; transform: translate(-50%, -22px) scale(0.9); }
+}
+
+/* --- title & result cards: glossy, bouncy ------------------------------------------------------ */
+.overlay { background: color-mix(in srgb, var(--sky-1) 25%, rgb(0 30 20 / 0.35)); backdrop-filter: blur(6px); }
+.panel {
+  position: relative;
+  border-radius: 28px;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--surface) 96%, #fff), var(--surface));
+  box-shadow: 0 0 0 4px rgb(255 255 255 / 0.7), 0 30px 70px rgb(0 40 20 / 0.35);
+  animation: card-pop 0.5s cubic-bezier(.2, 1.5, .4, 1) both;
+}
+.panel::before {
+  content: ""; position: absolute; left: 0; right: 0; top: 0; height: 8px; border-radius: 28px 28px 0 0;
+  background: linear-gradient(90deg, #ff6f61, #ffb347, #ffe066, #5fd47e, #4fc3f7, #b388ff);
+}
+@keyframes card-pop { from { transform: translateY(24px) scale(0.9); opacity: 0; } }
+.panel h2 {
+  font-size: 2.1rem; font-weight: 900;
+  background: linear-gradient(180deg, #ffb347, #ff6f3c); -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.panel .hero { font-size: 3rem; letter-spacing: 0.08em; animation: hero-bounce 2.4s ease-in-out infinite; display: inline-block; }
+@keyframes hero-bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+.button {
+  position: relative; overflow: hidden;
+  padding: 14px 30px; border: 0; border-radius: 18px;
+  font-size: 1.1rem; font-weight: 900; letter-spacing: 0.02em;
+  background: linear-gradient(180deg, #8ff0a4 0%, var(--candy-1) 40%, var(--candy-2) 100%);
+  color: #fff; text-shadow: 0 2px 0 rgb(0 80 30 / 0.45);
+  box-shadow: inset 0 2px 0 rgb(255 255 255 / 0.7), 0 6px 0 var(--candy-edge), 0 12px 22px rgb(22 112 58 / 0.35);
+  transition: transform 0.12s ease, box-shadow 0.12s ease, filter 0.15s ease;
+}
+.button::after {
+  content: ""; position: absolute; inset: 0;
+  background: linear-gradient(110deg, transparent 30%, rgb(255 255 255 / 0.6) 48%, transparent 66%);
+  transform: translateX(-120%); transition: transform 0.6s ease;
+}
+.button:hover { transform: translateY(-2px); filter: brightness(1.05); }
+.button:hover::after { transform: translateX(120%); }
+.button:active { transform: translateY(4px); box-shadow: inset 0 2px 0 rgb(255 255 255 / 0.6), 0 2px 0 var(--candy-edge); }
+.button.secondary {
+  background: linear-gradient(180deg, #ffffff, #e8efe9); color: #13261a; text-shadow: none;
+  box-shadow: inset 0 2px 0 #fff, 0 5px 0 #b9c7bd, 0 10px 18px rgb(0 0 0 / 0.12);
+}
+.panel kbd { background: linear-gradient(180deg, #fff, #eef2ef); color: #13261a; box-shadow: 0 2px 0 rgb(0 0 0 / 0.15); border-color: rgb(0 0 0 / 0.12); }
+
+@media (prefers-reduced-motion: reduce) {
+  body::before, .brand span, .timer-fill, .tile.selected .tile-body, .panel, .panel .hero { animation: none !important; }
+}

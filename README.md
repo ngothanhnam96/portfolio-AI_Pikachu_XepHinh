@@ -71,3 +71,17 @@ system font. Licensed under Apache-2.0.
 Optional, anonymous play counts via [GoatCounter](https://www.goatcounter.com): no cookies and no
 personal data. It is off until you set `GOATCOUNTER_CODE` in `src/ui/analytics.js`. Events are
 sent when a game starts and when it ends; see the `track(...)` calls in `src/main.js`.
+
+
+## Visual finish
+
+The game has a modern casual look, in CSS only:
+
+- **Background:** a living sky with drifting clouds and rolling hills.
+- **Board:** a frosted tray.
+- **Tiles:** glossy 3D candy tiles with a top gloss, thickness and drop shadow. They lift on hover, bob and glow when selected, and pop with a sparkle ring when matched.
+- **HUD:** pill counters, a striped candy timer that throbs red when time is short, and round glossy buttons.
+- **Combo:** big outlined combo text.
+- **Cards:** bouncy title and result cards with a rainbow edge and a shine-sweep button.
+
+Light and dark themes are both covered, and `prefers-reduced-motion` turns the animation off.
